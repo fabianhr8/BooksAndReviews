@@ -48,7 +48,6 @@ router.route('/agregar').post((req, res) => {
 // Mostrar un libro
 router.route('/:libroid').get((req, res) => {
     const { libroid } = req.params;
-    console.log(libroid)
     // Buscar en la base de datos un libro en especifico
     Libro.findById(libroid)
         .then(libro => res.json(libro))
@@ -57,19 +56,20 @@ router.route('/:libroid').get((req, res) => {
 
 // Borrar un libro
 router.route('/:libroid').delete((req, res) => {
-    Libro.findByIdAndDelete(req.params.id)
+    Libro.findByIdAndDelete(req.params.libroid)
         .then(() => res.json('Libro eliminado.'))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Modificar libro
 router.route('/modificar/:libroid').post((req, res) => {
-    Libro.findById(req.params.id)
+    console.log(req.body)
+    Libro.findById(req.params.libroid)
         .then(libro => {
-            libro.usuario = req.body.usuario;
             libro.titulo = req.body.titulo;
             libro.resena = req.body.resena;
             libro.calificacion = Number(req.body.calificacion);
+            libro.usuarioNombre = req.body.usuarioNombre;
 
             libro.save()
                 .then(() => res.json('Libro actualizado'))
