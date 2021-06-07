@@ -1,6 +1,6 @@
-# Books&Reviews - React app for book reviews
+# Libros&Resenas - React app for book reviews
 
-Simple app for users to review books, created with React.js, Node.js, and MongoDB.
+Simple app with full CRUD for users to review books, created with React.js, Node.js, and MongoDB.
 
 ## Table of contents
 
@@ -18,9 +18,8 @@ Once the book is added to the database, then you can check all the users and the
 
 You can modify the user's name and the reviews, including the book's title, review and score. All changes will reflect on the other elements. i.e. If you change the name of a user, all the books written by that user will also change the creator's name.
 
-The app also lets you delete users and reviews. 
+The app also lets you delete users and reviews. Once a user is deleted, all the books associated with the user are also deleted.
 
-PENDING: Once you delete a user, the reviews by that user remain, so it is necessary to fix that.
 	
 ## Technologies
 
