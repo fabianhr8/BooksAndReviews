@@ -25,13 +25,14 @@ export default class UsuariosLista extends Component {
     }
 
     // Esta ciclo de vida (React lifecycle) corre antes de que cualquier cosa aparezca en pantalla
-    componentDidMount() {
-        axios.get('http://localhost:5000/usuarios/')
-            .then(res => {
-                // Llenar state.usuarios con todos los usuarios de la base de datos
-                this.setState({ usuarios: res.data });
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            const res = await axios.get('http://localhost:5000/usuarios/');
+            this.setState({ usuarios: res.data });
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     usuariosLista() {

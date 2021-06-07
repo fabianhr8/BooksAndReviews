@@ -4,16 +4,19 @@ let Libro = require('../models/libro.model');
 let Usuario = require('../models/usuario.model');
 
 // Mostrar todos los libros
-router.route('/').get((req, res) => {
-    // Sacar todos los libros de la base de datos
-    Libro.find()
-        // mostrar los libros mediante json
-        .then(libros => res.json(libros))
-        .catch(err => res.status(400).json('Error: ' + err));
+router.route('/').get(async (req, res) => {
+    try {
+        // Sacar todos los libros de la base de datos
+        const libros = await Libro.find();
+        res.json(libros);
+    } catch (err) {
+        console.log('OH NO!!!!');
+        console.log(err);
+    }
 });
 
 // Agregar nuevo libro
-router.route('/agregar').post((req, res) => {
+router.route('/agregar').post(async (req, res) => {
     const usuarioNombre = req.body.usuario;
     const usuarioId = req.body.usuarioId;
     const titulo = req.body.titulo;
@@ -27,65 +30,66 @@ router.route('/agregar').post((req, res) => {
         resena,
         calificacion
     });
-    console.log(nuevoLibro);
-    
-    Usuario.findById(usuarioId)
-        .then((usuarioActual) => {
-            console.log(usuarioActual);
-            usuarioActual.libros.push(nuevoLibro);
-            usuarioActual.save()
-                .then(() => {
-                    nuevoLibro.save()
-                        .then(() => {
-                            res.json('¡Reseña agregada!');
-                        })
-                        .catch(err => res.status(400).json('Error: ' + err))
-                })
-        })
-        .catch(err => res.status(400).json('Error: ' + err))
+
+    try {
+        const usuarioActual = await Usuario.findById(usuarioId);
+        usuarioActual.libros.push(nuevoLibro);
+        await usuarioActual.save();
+        await nuevoLibro.save();
+        res.json('¡Reseña agregada!');
+    } catch (err) {
+        console.log('OH NO!!!!');
+        console.log(err);
+    }
 });
 
 // Mostrar un libro
-router.route('/:libroid').get((req, res) => {
+router.route('/:libroid').get(async (req, res) => {
     const { libroid } = req.params;
-    // Buscar en la base de datos un libro en especifico
-    Libro.findById(libroid)
-        .then(libro => res.json(libro))
-        .catch(err => res.status(400).json('Error: ' + err));
+
+    try {
+        // Buscar en la base de datos un libro en especifico
+        const libro = await Libro.findById(libroid);
+        res.json(libro);
+    } catch (err) {
+        console.log('OH NO!!!!');
+        console.log(err);
+    }
 });
 
 // Borrar un libro
-router.route('/:libroid').delete((req, res) => {
-    Libro.findByIdAndDelete(req.params.libroid)
-        .then(() => res.json('Libro eliminado.'))
-        .catch(err => res.status(400).json('Error: ' + err));
+router.route('/:libroid').delete(async (req, res) => {
+    try {
+        await Libro.findByIdAndDelete(req.params.libroid); 
+        res.json('Libro eliminado.');
+    } catch (err) {
+        console.log('OH NO!!!!');
+        console.log(err);
+    }
 });
 
 // Modificar libro
-router.route('/modificar/:libroid').post((req, res) => {
-    console.log(req.body)
-    Libro.findById(req.params.libroid)
-        .then(libro => {
-            libro.titulo = req.body.titulo;
-            libro.resena = req.body.resena;
-            libro.calificacion = Number(req.body.calificacion);
-            libro.usuarioNombre = req.body.usuarioNombre;
+router.route('/modificar/:libroid').post(async (req, res) => {
 
-            libro.save()
-                .then(() => res.json('Libro actualizado'))
-                .catch(err => res.status(400).json('Error: ' + err));
-        })
-        .catch(err => res.status(400).json('Error: ' + err));
+    try {
+        const libroActual = await Libro.findById(req.params.libroid);
+        // Por si viene desde "editar usuario"
+        if (req.body.nombre) {
+            libroActual.usuarioNombre = req.body.nombre;
+        }
+        // O desde "editar libro"
+        else {
+            libroActual.titulo = req.body.titulo;
+            libroActual.resena = req.body.resena;
+            libroActual.calificacion = Number(req.body.calificacion);
+            libroActual.usuarioNombre = req.body.usuarioNombre;
+        }
+        await libroActual.save();
+        res.json('Libro actualizado');
+    } catch (err) {
+        console.log('OH NO!!!!');
+        console.log(err);
+    }
 });
 
-// // Ver libros sobre un usuario en especifico
-// router.route('/:usuarioid/libros').get((req, res) => {
-//     const { usuarioid } = req.params;
-//     Usuario.findById(usuarioid)
-//         .then(usuarioActual => res.json(usuarioActual))
-//         .catch(err => res.status(400).json('Error: ' + err))
-//     console.log(usuarioActual)
-// });
-
-// Export router
 module.exports = router;

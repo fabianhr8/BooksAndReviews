@@ -16,16 +16,18 @@ export default class UsuarioActual extends Component {
         };
     }
 
-    componentDidMount() {
-        // this.props.location.usuarioID viene de la pagina usuarios-lista.component.js
-        axios.get(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`)
-            .then(res => {
-                this.setState({ 
-                    nombre: res.data.nombre,
-                    libros: res.data.libros
-                });
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            // this.props.location.usuarioID viene de la pagina usuarios-lista.component.js
+            const res = await axios.get(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`);
+            this.setState({ 
+                nombre: res.data.nombre,
+                libros: res.data.libros
+            });
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     cambioEnNombre(e) {
@@ -35,26 +37,26 @@ export default class UsuarioActual extends Component {
     }
 
 
-    alEnviar(e) {
+    async alEnviar(e) {
         // Evitar que cargue otra pagina
         e.preventDefault();
 
         const usuario = {
             nombre: this.state.nuevoNombre,
-            libros: this.state.libros
         }
-        console.log(usuario);
+        
+        try {
+            await axios.post(`http://localhost:5000/usuarios/modificar/${this.props.location.usuarioId}`, usuario);
+            for (let libro of this.state.libros) {
+                await axios.post(`http://localhost:5000/libros/modificar/${libro}`, usuario);
+            }
 
-        axios.post(`http://localhost:5000/usuarios/modificar/${this.props.location.usuarioId}`, usuario)
-            .then(res => {
-                axios.post(`http://localhost:5000/libros/modificar/${this.props.location.usuarioId}`, usuario)
-                .then(res => {
-                    window.location = '/usuarios';                // Regresar a lista de usuarios
-                })
-                .catch(err => console.log(err));
-                window.location = '/usuarios';                // Regresar a lista de usuarios
-            })
-            .catch(err => console.log(err));
+            // await axios.post(`http://localhost:5000/libros/modificar/${this.props.location.usuarioId}`, usuario)
+            window.location = '/usuarios';                // Regresar a lista de usuarios
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     render () {

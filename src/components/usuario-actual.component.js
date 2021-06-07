@@ -29,37 +29,39 @@ export default class UsuarioActual extends Component {
         };
     }
 
-    componentDidMount() {
-        // this.props.location.usuarioID viene de la pagina usuarios-lista.component.js
-        axios.get(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`)
-            .then(res => {
-                this.setState({ 
-                    nombre: res.data.nombre,
-                    libros: res.data.libros.map(actualLibro => actualLibro)
-                });
-                // Obtener todos los libros y filtrar solo los que tengan el ID del usuario
-                axios.get('http://localhost:5000/libros/')
-                    .then(res => {
-                        this.setState({ librosTotal: res.data });
-                        // console.log(this.state)
-                        const lib = [];
-                        const libId = [];
-                        for (let i = 0; i < this.state.libros.length; i++) {
-                            for (let j = 0; j < this.state.librosTotal.length; j++) {
-                                if (this.state.libros[i] === this.state.librosTotal[j]._id) {
-                                    lib.push(this.state.librosTotal[j].titulo);
-                                    libId.push(this.state.librosTotal[j]._id);
-                                }
-                            }
-                        }
-                        this.setState({
-                            libros: lib,
-                            librosId: libId
-                        });
-                    })
-                    .catch(err => console.log(err));
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            // this.props.location.usuarioID viene de la pagina usuarios-lista.component.js
+            const res = await axios.get(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`);
+            this.setState({ 
+                nombre: res.data.nombre,
+                libros: res.data.libros.map(actualLibro => actualLibro)
+            });
+
+            // Obtener todos los libros y filtrar solo los que tengan el ID del usuario
+            const res2 = await axios.get('http://localhost:5000/libros/');
+            this.setState({ librosTotal: res2.data });
+
+            const lib = [];
+            const libId = [];
+            for (let i = 0; i < this.state.libros.length; i++) {
+                for (let j = 0; j < this.state.librosTotal.length; j++) {
+                    if (this.state.libros[i] === this.state.librosTotal[j]._id) {
+                        lib.push(this.state.librosTotal[j].titulo);
+                        libId.push(this.state.librosTotal[j]._id);
+                    }
+                }
+            }
+
+            this.setState({
+                libros: lib,
+                librosId: libId
+            });
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
+
     }
 
     // Mostrar todos los libros, son links para ir a la resena de cada libro
@@ -100,13 +102,17 @@ export default class UsuarioActual extends Component {
         )
     }
 
-    eliminarUsuario() {
-
-        axios.delete(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`)
-            .then(res => {
-                window.location = '/usuarios';                // Regresar a lista de usuarios
-            })
-            .catch(err => console.log(err));
+    async eliminarUsuario() {
+        try {
+            await axios.delete(`http://localhost:5000/usuarios/${this.props.location.usuarioId}`);
+            for (let libro of this.state.librosId) {
+                await axios.delete(`http://localhost:5000/libros/${libro}`);
+            }
+            window.location = '/usuarios';                // Regresar a lista de usuarios
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err); 
+        }
     }
 
     render () {

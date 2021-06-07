@@ -51,7 +51,7 @@ export default class UsuarioActual extends Component {
         });
     }
 
-    alEnviar(e) {
+    async alEnviar(e) {
         // Evitar que cargue otra pagina
         e.preventDefault();
 
@@ -61,13 +61,9 @@ export default class UsuarioActual extends Component {
             calificacion: this.state.calificacion,
             usuarioNombre: this.state.usuarioNombre
         }
-        console.log(libro);
 
-        axios.post(`http://localhost:5000/libros/modificar/${this.props.location.libroId}`, libro)
-            .then(res => {
-                window.location = '/libros';                // Go back to the list of exercises
-            })
-            .catch(err => console.log(err));
+        await axios.post(`http://localhost:5000/libros/modificar/${this.props.location.libroId}`, libro);
+        window.location = '/libros';
     }
 
     render () {

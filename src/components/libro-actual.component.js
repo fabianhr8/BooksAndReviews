@@ -19,18 +19,20 @@ export default class UsuarioActual extends Component {
         };
     }
 
-    componentDidMount() {
-        axios.get(`http://localhost:5000/libros/${this.props.location.libroId}`)
-            .then(res => {
-                this.setState({ 
-                    usuarioNombre: res.data.usuarioNombre,
-                    titulo: res.data.titulo,
-                    resena: res.data.resena,
-                    calificacion: res.data.calificacion,
-                    usuarioId: res.data.usuarioId
-                });
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            const res = await axios.get(`http://localhost:5000/libros/${this.props.location.libroId}`);
+            this.setState({ 
+                usuarioNombre: res.data.usuarioNombre,
+                titulo: res.data.titulo,
+                resena: res.data.resena,
+                calificacion: res.data.calificacion,
+                usuarioId: res.data.usuarioId
+            });
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     editarResena() {
@@ -42,13 +44,14 @@ export default class UsuarioActual extends Component {
         )
     }
 
-    eliminarResena() {
-
-        axios.delete(`http://localhost:5000/libros/${this.props.location.libroId}`)
-            .then(res => {
-                window.location = '/libros';                // Regresar a lista de libros
-            })
-            .catch(err => console.log(err));
+    async eliminarResena() {
+        try {
+            await axios.delete(`http://localhost:5000/libros/${this.props.location.libroId}`);
+            window.location = '/libros';                // Regresar a lista de libros
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     render () {

@@ -40,7 +40,7 @@ app.use('/usuarios', usuariosRouter);
 
 // Home page
 app.get('/', (req, res) => {
-    res.send('HOME PAGE');
+    res.send('SERVER HOME PAGE');
 });
 
 // Start the server

@@ -24,19 +24,18 @@ export default class ExerciseList extends Component {
     constructor(props) {
         super(props);
 
-        // Bind methods so that the word 'this' refers to the class
-        // this.deleteExercise = this.deleteExercise.bind(this);
-
         this.state = { libros: [] };
     }
 
     // Esta ciclo de vida (React lifecycle) corre antes de que cualquier cosa aparezca en pantalla
-    componentDidMount() {
-        axios.get('http://localhost:5000/libros/')
-            .then(res => {
-                this.setState({ libros: res.data });
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            const res = await axios.get('http://localhost:5000/libros/');
+            this.setState({ libros: res.data });
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     librosLista() {

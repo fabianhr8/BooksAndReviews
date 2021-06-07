@@ -20,7 +20,7 @@ export default class NuevoUsuario extends Component {
         });
     }
 
-    alEnviar(e) {
+    async alEnviar(e) {
         // Evitar que cargue otra pagina
         e.preventDefault();
 
@@ -28,12 +28,14 @@ export default class NuevoUsuario extends Component {
             nombre: this.state.nombre
         }
 
-        axios.post('http://localhost:5000/usuarios/agregar', usuario)
-            .then(res => console.log(res.data));
-
-        this.setState({
-            nombre: ''
-        });
+        // Crear usuario
+        try {
+            await axios.post('http://localhost:5000/usuarios/agregar', usuario);
+            window.location = '/usuarios';
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     render () {

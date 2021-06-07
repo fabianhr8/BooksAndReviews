@@ -24,21 +24,21 @@ export default class NuevoLibro extends Component {
     }
 
     // This is a React lifecycle method. It will be called right before anything is displayed on the page
-    componentDidMount() {
-        axios.get('http://localhost:5000/usuarios/')
-            .then(res => {
-                // Ver si hay al menos un usuario
-                if (res.data.length > 0) {
-
-                    this.setState({
-                        usuarios: res.data.map(actualUsuario => actualUsuario.nombre),
-                        usuariosId: res.data.map(actualUsuario => actualUsuario._id),
-                        usuario: res.data[0].nombre,
-                        usuarioId: res.data[0]._id
-                    });
-                }
-            })
-            .catch(err => console.log(err));
+    async componentDidMount() {
+        try {
+            const res = await axios.get('http://localhost:5000/usuarios/');
+            if (res.data.length > 0) {
+                this.setState({
+                    usuarios: res.data.map(actualUsuario => actualUsuario.nombre),
+                    usuariosId: res.data.map(actualUsuario => actualUsuario._id),
+                    usuario: res.data[0].nombre,
+                    usuarioId: res.data[0]._id
+                });
+            }
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     cambioEnNombre(e) {
@@ -68,7 +68,7 @@ export default class NuevoLibro extends Component {
         });
     }
 
-    alEnviar(e) {
+    async alEnviar(e) {
         // Evitar que cargue otra pagina
         e.preventDefault();
         
@@ -79,12 +79,14 @@ export default class NuevoLibro extends Component {
             resena: this.state.resena,
             calificacion: this.state.calificacion
         }
-        console.log(libro);
 
-        axios.post('http://localhost:5000/libros/agregar', libro)
-            .then(res => {
-                window.location = '/libros';                // Go back to the list of exercises
-            });
+        try {
+            const libNuevo = await axios.post('http://localhost:5000/libros/agregar', libro);
+            window.location = '/libros';                // Go back to the list of exercises
+        } catch (err) {
+            console.log('OH NO!!!!');
+            console.log(err);
+        }
     }
 
     render () {
